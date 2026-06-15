@@ -1,0 +1,105 @@
+<section class="testimonial-editorial" id="Testimonial-{{ section.id }}">
+  <div class="testimonial-inner">
+    <div class="testimonial-content">
+      <div class="testimonial-quote-mark">"</div>
+      <h2 class="testimonial-quote">
+        {{ section.settings.quote | default: 'Chiếc chăn này đã thay đổi hoàn toàn giấc ngủ của tôi. Cảm giác như được ôm ấp bởi một đám mây ấm áp mỗi đêm.' | escape }}
+      </h2>
+      <div class="testimonial-author">
+        <span class="testimonial-name">{{ section.settings.author | default: 'Mai Phương' | escape }}</span>
+        {% if section.settings.author_role != blank %}
+          <span class="testimonial-role">{{ section.settings.author_role | escape }}</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonial-editorial {
+    padding: calc(var(--page-margin) * 6) var(--page-margin);
+    background-color: var(--color-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .testimonial-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .testimonial-quote-mark {
+    font-family: var(--font-heading);
+    font-size: 6rem;
+    line-height: 0.5;
+    color: var(--color-brand-sage);
+    margin-bottom: 2rem;
+  }
+  .testimonial-quote {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--color-foreground);
+    margin: 0 0 3rem 0;
+  }
+  .testimonial-author {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .testimonial-name {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--color-foreground);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .testimonial-role {
+    font-size: 0.95rem;
+    color: var(--color-foreground);
+    opacity: 0.6;
+  }
+
+  @media (max-width: 767px) {
+    .testimonial-editorial {
+      padding: calc(var(--page-margin) * 4) var(--page-margin);
+    }
+    .testimonial-quote-mark {
+      font-size: 4rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Editorial Testimonial",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "Quote",
+      "default": "Chiếc chăn này đã thay đổi hoàn toàn giấc ngủ của tôi. Cảm giác như được ôm ấp bởi một đám mây ấm áp mỗi đêm."
+    },
+    {
+      "type": "text",
+      "id": "author",
+      "label": "Author Name",
+      "default": "Mai Phương"
+    },
+    {
+      "type": "text",
+      "id": "author_role",
+      "label": "Author Role",
+      "default": "Khách hàng"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial Testimonial"
+    }
+  ]
+}
+{% endschema %}

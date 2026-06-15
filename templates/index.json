@@ -1,0 +1,45 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "hero-editorial-split",
+      "settings": {}
+    },
+    "bento": {
+      "type": "bento-benefits",
+      "settings": {}
+    },
+    "featured": {
+      "type": "featured-collection-premium",
+      "settings": {}
+    },
+    "testimonial": {
+      "type": "testimonial-editorial",
+      "settings": {}
+    },
+    "faux-fur": {
+      "type": "collection-faux-fur",
+      "settings": {}
+    },
+    "creative-patterns": {
+      "type": "collection-creative-patterns",
+      "settings": {}
+    }
+  },
+  "order": [
+    "hero",
+    "bento",
+    "featured",
+    "faux-fur",
+    "creative-patterns",
+    "testimonial"
+  ]
+}

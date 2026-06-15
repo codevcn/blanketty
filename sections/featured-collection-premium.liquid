@@ -1,0 +1,433 @@
+{% liquid
+  assign heading = section.settings.heading | default: 'Mùa Đông'
+  assign collection = collections['bst-mua-dong']
+  assign product_limit = section.settings.product_limit | default: 6
+%}
+
+<section class="winter-editorial" id="Winter-{{ section.id }}">
+  <div class="winter-container">
+    <!-- Left: Typography Block -->
+    <div class="winter-text-block">
+      <div class="winter-text-sticky">
+        <div class="winter-eyebrow">Ấm áp & Sang trọng</div>
+        <h2 class="winter-heading">{{ heading | escape }}</h2>
+        <p class="winter-description">
+          Khám phá những thiết kế chăn mùa đông được dệt thủ công với chất liệu cao cấp nhất, mang lại sự ấm áp tuyệt
+          đối cho không gian sống của bạn.
+        </p>
+        {% if collection.url != blank %}
+          <a href="{{ collection.url }}" class="winter-cta group">
+            <span class="winter-cta-text">Xem tất cả</span>
+            <div class="winter-cta-icon">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right: Horizontal Scroll Track (Staggered Cards) -->
+    <div class="winter-slider">
+      <div class="winter-slider-track">
+        {% if collection != blank and collection.products_count > 0 %}
+          {% for product in collection.products limit: product_limit %}
+            <!-- Assign staggered class based on odd/even index -->
+            {% assign stagger_class = 'w-card-even' %}
+            {% if forloop.index == 1 or forloop.index == 3 or forloop.index == 5 %}
+              {% assign stagger_class = 'w-card-odd' %}
+            {% endif %}
+
+            <a href="{{ product.url }}" class="w-card group {{ stagger_class }}">
+              <div class="w-card-shell">
+                <div class="w-card-core">
+                  {% if product.featured_image %}
+                    {{
+                      product.featured_image
+                      | image_url: width: 600
+                      | image_tag: loading: 'lazy', class: 'w-card-img'
+                    }}
+                  {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'w-card-img placeholder-svg' }}
+                  {% endif %}
+                  <div class="w-card-overlay"></div>
+                  <div class="w-card-meta">
+                    {% if product.vendor != blank %}
+                      <span class="w-card-vendor">{{ product.vendor }}</span>
+                    {% endif %}
+                    <h3 class="w-card-title">{{ product.title }}</h3>
+                    <p class="w-card-price">{{ product.price | money }}</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        {% else %}
+          <!-- Empty State Placeholders -->
+          {% for i in (1..4) %}
+            {% assign stagger_class = 'w-card-even' %}
+            {% if forloop.index == 1 or forloop.index == 3 %}
+              {% assign stagger_class = 'w-card-odd' %}
+            {% endif %}
+            <a href="#" class="w-card group {{ stagger_class }}">
+              <div class="w-card-shell">
+                <div class="w-card-core">
+                  {{ 'product-' | append: i | placeholder_svg_tag: 'w-card-img placeholder-svg' }}
+                  <div class="w-card-overlay"></div>
+                  <div class="w-card-meta">
+                    <span class="w-card-vendor">Blanketty</span>
+                    <h3 class="w-card-title">Chăn Lông Cừu Mẫu {{ i }}</h3>
+                    <p class="w-card-price">1,200,000₫</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Base Reset & Vibe */
+  .winter-editorial {
+    background-color: var(--color-surface-soft); /* Warm cream */
+    color: var(--color-ink);
+    padding: 140px 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* CSS Noise (Film grain) for paper texture */
+  .winter-editorial::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .winter-editorial a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  /* Split Layout Container */
+  .winter-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding-left: max(32px, calc((100vw - 1400px) / 2));
+    display: flex;
+    align-items: stretch;
+    gap: 60px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Left Side: Typography */
+  .winter-text-block {
+    flex: 0 0 40%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .winter-text-sticky {
+    position: sticky;
+    top: 140px; /* Keep it pinned while scrolling if section gets tall */
+  }
+
+  .winter-eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background-color: var(--color-canvas);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    font-family: var(--font-family-body);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+    margin-bottom: 32px;
+    color: var(--color-muted);
+  }
+
+  .winter-heading {
+    font-family: var(--font-family-display);
+    font-size: clamp(4rem, 8vw, 7.5rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin: 0 0 24px 0;
+    color: var(--color-ink);
+    text-transform: uppercase;
+  }
+
+  .winter-description {
+    font-family: var(--font-family-body);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-body);
+    margin: 0 0 40px 0;
+    max-width: 400px;
+  }
+
+  /* CTA Button */
+  .winter-cta {
+    display: inline-flex;
+    align-items: center;
+    background-color: black;
+    padding: 8px 8px 8px 28px;
+    border-radius: 9999px;
+    font-family: var(--font-family-body);
+    font-weight: 600;
+    font-size: 14px;
+    width: fit-content;
+    transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.3s ease;
+  }
+  .winter-cta:active {
+    transform: scale(0.98);
+  }
+  .winter-cta-text {
+    margin-right: 20px;
+    color: var(--color-background);
+  }
+  .winter-cta-icon {
+    width: 44px;
+    height: 44px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.3s ease;
+    color: var(--color-background);
+  }
+  .winter-cta:hover .winter-cta-icon {
+    transform: translateX(4px) translateY(-1px) scale(1.05);
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Right Side: Horizontal Slider */
+  .winter-slider {
+    flex: 1;
+    min-width: 0; /* allows flex child to shrink below intrinsic width */
+    padding: 20px 0; /* Room for card hover shadows */
+  }
+
+  .winter-slider-track {
+    display: flex;
+    gap: 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    padding-right: 32px;
+    padding-bottom: 40px; /* Space for stagger offset */
+  }
+  .winter-slider-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Cards */
+  .w-card {
+    flex: 0 0 320px;
+    scroll-snap-align: start;
+    display: block;
+    position: relative;
+    transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .w-card:active {
+    transform: scale(0.98);
+  }
+
+  /* Staggered Vertical Offset */
+  .w-card-odd {
+    transform: translateY(0);
+  }
+  .w-card-even {
+    transform: translateY(40px);
+  }
+
+  .w-card-shell {
+    background-color: var(--color-canvas);
+    padding: 10px;
+    border-radius: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.8s ease;
+    height: 100%;
+  }
+  .w-card:hover .w-card-shell {
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Reset Stagger Offset on Hover */
+  .w-card-odd:hover {
+    transform: translateY(-8px);
+  }
+  .w-card-even:hover {
+    transform: translateY(32px);
+  }
+
+  .w-card-core {
+    background-color: #f0f0f0;
+    border-radius: calc(2rem - 10px);
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 3/4;
+  }
+
+  /* Image */
+  .w-card-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .w-card:hover .w-card-img {
+    transform: scale(1.05);
+  }
+  .placeholder-svg {
+    opacity: 0.4;
+    padding: 40px;
+  }
+
+  /* Overlay & Text */
+  .w-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 60%);
+    opacity: 0.7;
+    transition: opacity 0.8s ease;
+  }
+  .w-card:hover .w-card-overlay {
+    opacity: 0.9;
+  }
+
+  .w-card-meta {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .w-card-vendor {
+    font-family: var(--font-family-body);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .w-card-title {
+    font-family: var(--font-family-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+  }
+
+  .w-card-price {
+    font-family: var(--font-family-body);
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+  }
+
+  /* Mobile Collapse - Vertical Stack */
+  @media (max-width: 989px) {
+    .winter-editorial {
+      padding: 80px 0;
+    }
+    .winter-container {
+      flex-direction: column;
+      padding-left: 0;
+      gap: 40px;
+    }
+    .winter-text-block {
+      max-width: 100%;
+      padding: 0 24px;
+      text-align: left;
+    }
+    .winter-text-sticky {
+      position: static;
+    }
+    .winter-heading {
+      font-size: clamp(3.5rem, 12vw, 5rem);
+    }
+
+    .winter-slider-track {
+      padding: 0 24px 24px 24px;
+      gap: 20px;
+      scroll-padding-left: 24px;
+    }
+    .w-card {
+      flex: 0 0 280px;
+    }
+
+    /* Remove stagger on mobile to save vertical space */
+    .w-card-even {
+      transform: translateY(0);
+    }
+    .w-card-even:hover {
+      transform: translateY(-8px);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Winter Collection",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Mùa Đông"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 6,
+      "label": "Maximum products to show"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Winter Collection"
+    }
+  ]
+}
+{% endschema %}

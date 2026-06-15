@@ -1,0 +1,1 @@
+shopify theme dev --store blanketty-zuepwfu7.myshopify.com

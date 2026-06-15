@@ -1,0 +1,370 @@
+{% liquid
+  assign collection = collections['vai-long-thu']
+  assign heading = section.settings.heading | default: 'Sự mềm mại tuyệt đối'
+%}
+
+<section class="ff-moodboard-section" id="FauxFur-{{ section.id }}">
+  <div class="ff-moodboard-container">
+    
+    <div class="ff-grid">
+      <!-- Left Column -->
+      <div class="ff-col ff-col--left">
+        <div class="ff-text-block">
+          <div class="ff-eyebrow">Bộ sưu tập vải lông thú</div>
+          <h2 class="ff-heading">{{ heading | escape }}</h2>
+          <p class="ff-description">Tôn vinh sự tinh tế qua từng sợi dệt. Trải nghiệm cảm giác nâng niu và mềm mại đích thực trong không gian tổ ấm của bạn.</p>
+        </div>
+
+        {% if collection != blank and collection.products_count > 0 %}
+          {% assign product_1 = collection.products[0] %}
+          {% if product_1 %}
+            <a href="{{ product_1.url }}" class="ff-card group ff-portrait">
+              <div class="ff-image-wrap">
+                {% if product_1.featured_image %}
+                  {{ product_1.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'ff-image' }}
+                {% else %}
+                  {{ 'product-1' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+                {% endif %}
+              </div>
+              <div class="ff-meta">
+                <h3 class="ff-title">{{ product_1.title }}</h3>
+                <p class="ff-price">{{ product_1.price | money }}</p>
+              </div>
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="#" class="ff-card group ff-portrait">
+            <div class="ff-image-wrap">
+              {{ 'product-1' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+            </div>
+            <div class="ff-meta">
+              <h3 class="ff-title">Sản phẩm mẫu 1</h3>
+              <p class="ff-price">1,000,000₫</p>
+            </div>
+          </a>
+        {% endif %}
+      </div>
+
+      <!-- Right Column -->
+      <div class="ff-col ff-col--right">
+        {% if collection != blank and collection.products_count > 0 %}
+          {% assign product_2 = collection.products[1] %}
+          {% if product_2 %}
+            <a href="{{ product_2.url }}" class="ff-card group ff-landscape">
+              <div class="ff-image-wrap">
+                {% if product_2.featured_image %}
+                  {{ product_2.featured_image | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'ff-image' }}
+                {% else %}
+                  {{ 'product-2' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+                {% endif %}
+              </div>
+              <div class="ff-meta">
+                <h3 class="ff-title">{{ product_2.title }}</h3>
+                <p class="ff-price">{{ product_2.price | money }}</p>
+              </div>
+            </a>
+          {% endif %}
+
+          {% assign product_3 = collection.products[2] %}
+          {% if product_3 %}
+            <a href="{{ product_3.url }}" class="ff-card group ff-square">
+              <div class="ff-image-wrap">
+                {% if product_3.featured_image %}
+                  {{ product_3.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'ff-image' }}
+                {% else %}
+                  {{ 'product-3' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+                {% endif %}
+              </div>
+              <div class="ff-meta">
+                <h3 class="ff-title">{{ product_3.title }}</h3>
+                <p class="ff-price">{{ product_3.price | money }}</p>
+              </div>
+            </a>
+          {% endif %}
+        {% else %}
+          <a href="#" class="ff-card group ff-landscape">
+            <div class="ff-image-wrap">
+              {{ 'product-2' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+            </div>
+            <div class="ff-meta">
+              <h3 class="ff-title">Sản phẩm mẫu 2</h3>
+              <p class="ff-price">2,000,000₫</p>
+            </div>
+          </a>
+          <a href="#" class="ff-card group ff-square">
+            <div class="ff-image-wrap">
+              {{ 'product-3' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+            </div>
+            <div class="ff-meta">
+              <h3 class="ff-title">Sản phẩm mẫu 3</h3>
+              <p class="ff-price">1,500,000₫</p>
+            </div>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<style>
+  /* Base Reset & Vibe */
+  .ff-moodboard-section {
+    background-color: var(--color-canvas); /* Warm bright background */
+    padding: 180px 0;
+    overflow: hidden;
+  }
+  .ff-moodboard-section a {
+    text-decoration: none;
+    display: block;
+    color: inherit; /* Fix default browser link color */
+  }
+
+  .ff-moodboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* Grid Layout */
+  .ff-grid {
+    display: flex;
+    gap: 80px;
+    align-items: flex-start;
+  }
+  .ff-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+  }
+  .ff-col--right {
+    padding-top: 140px; /* Stagger the right column downwards */
+  }
+
+  /* Typography */
+  .ff-text-block {
+    margin-bottom: 40px;
+    position: sticky;
+    top: 120px;
+  }
+  .ff-eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background-color: rgba(0, 0, 0, 0.04);
+    font-family: var(--font-family-body);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--color-muted);
+  }
+  .ff-heading {
+    font-family: var(--font-family-display, serif);
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 1.1; 
+    letter-spacing: -0.04em;
+    margin: 0 0 24px 0;
+    color: var(--color-ink);
+  }
+  .ff-description {
+    font-family: var(--font-family-body);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-body);
+    margin: 0;
+    max-width: 80%;
+  }
+
+  /* Ethereal Cards */
+  .ff-card {
+    position: relative;
+  }
+  .ff-image-wrap {
+    position: relative;
+    overflow: hidden;
+    /* Massive border radius for pill/capsule shapes */
+    border-radius: 3rem; 
+    /* Ethereal floating shadow */
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.06);
+    transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.8s ease, border-radius 0.8s ease;
+    background-color: var(--color-surface-soft);
+  }
+  
+  .ff-card:hover .ff-image-wrap {
+    transform: translateY(-8px);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.12);
+    border-radius: 2rem; /* Morphing shape slightly */
+  }
+  .ff-card:active .ff-image-wrap {
+    transform: scale(0.98);
+  }
+
+  .ff-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ff-card:hover .ff-image {
+    transform: scale(1.05);
+  }
+
+  /* Aspect Ratios for Asymmetrical Moodboard */
+  .ff-portrait .ff-image-wrap {
+    aspect-ratio: 3/4;
+  }
+  .ff-landscape .ff-image-wrap {
+    aspect-ratio: 4/3;
+  }
+  .ff-square .ff-image-wrap {
+    aspect-ratio: 1/1;
+  }
+
+  /* External Meta Data (Floating Badge over image) */
+  .ff-meta {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    z-index: 10;
+    padding: 16px 24px 16px 32px;
+    background-color: rgba(255, 250, 240, 0.9);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 2rem;
+    transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.8s ease;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    max-width: calc(100% - 48px);
+  }
+  
+  /* Decorative line on the left inside the badge */
+  .ff-meta::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 0;
+    background-color: var(--color-ink, #111111);
+    transition: height 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+    border-radius: 2px;
+  }
+  
+  .ff-card:hover .ff-meta::before {
+    height: 60%;
+  }
+
+  .ff-card:hover .ff-meta {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  }
+
+  .ff-title {
+    font-family: var(--font-family-display, serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--color-ink, #111111) !important;
+    margin: 0 0 8px 0;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* High-end animated underline */
+  .ff-title::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 0%;
+    height: 1px;
+    background-color: var(--color-ink, #111111);
+    transition: width 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .ff-card:hover .ff-title::after {
+    width: 100%;
+  }
+
+  .ff-price {
+    font-family: var(--font-family-body, sans-serif);
+    font-size: 1.125rem;
+    color: var(--color-muted, #666666) !important;
+    margin: 0;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  /* Placeholders */
+  .placeholder-svg {
+    opacity: 0.3;
+    padding: 60px;
+  }
+
+  /* Mobile Collapse - Vertical Stack */
+  @media (max-width: 989px) {
+    .ff-moodboard-section {
+      padding: 80px 0;
+    }
+    .ff-grid {
+      flex-direction: column;
+      gap: 40px;
+    }
+    .ff-col {
+      gap: 40px;
+    }
+    .ff-col--right {
+      padding-top: 0;
+    }
+    .ff-text-block {
+      position: relative;
+      top: 0;
+      margin-bottom: 20px;
+    }
+    .ff-description {
+      max-width: 100%;
+    }
+    .ff-image-wrap {
+      border-radius: 2rem;
+    }
+    .ff-portrait .ff-image-wrap,
+    .ff-landscape .ff-image-wrap,
+    .ff-square .ff-image-wrap {
+      aspect-ratio: 4/5; /* Normalize aspect ratio on mobile */
+    }
+    .ff-meta {
+      bottom: 16px;
+      left: 16px;
+      padding: 12px 20px 12px 28px;
+      max-width: calc(100% - 32px);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Faux Fur (Moodboard)",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Sự mềm mại tuyệt đối"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Faux Fur (Moodboard)"
+    }
+  ]
+}
+{% endschema %}
