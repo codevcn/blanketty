@@ -18,22 +18,25 @@
         </div>
 
         {% if collection != blank and collection.products_count > 0 %}
-          {% assign product_1 = collection.products[0] %}
-          {% if product_1 %}
-            <a href="{{ product_1.url }}" class="ff-card group ff-portrait">
-              <div class="ff-image-wrap">
-                {% if product_1.featured_image %}
-                  {{ product_1.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'ff-image' }}
-                {% else %}
-                  {{ 'product-1' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
-                {% endif %}
-              </div>
-              <div class="ff-meta">
-                <h3 class="ff-title">{{ product_1.title }}</h3>
-                <p class="ff-price">{{ product_1.price | money }}</p>
-              </div>
-            </a>
-          {% endif %}
+          {% for product in collection.products limit: 9 %}
+            {% assign mod = forloop.index0 | modulo: 3 %}
+            {% if mod == 0 %}
+              <a href="{{ product.url }}" class="ff-card group ff-portrait">
+                <div class="ff-image-wrap">
+                  {% if product.featured_image %}
+                    {{ product.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'ff-image' }}
+                  {% else %}
+                    {% assign placeholder_idx = forloop.index0 | modulo: 6 | plus: 1 %}
+                    {{ 'product-' | append: placeholder_idx | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+                  {% endif %}
+                </div>
+                <div class="ff-meta">
+                  <h3 class="ff-title">{{ product.title }}</h3>
+                  <p class="ff-price">{{ product.price | money }}</p>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
         {% else %}
           <a href="#" class="ff-card group ff-portrait">
             <div class="ff-image-wrap">
@@ -50,43 +53,27 @@
       <!-- Right Column -->
       <div class="ff-col ff-col--right">
         {% if collection != blank and collection.products_count > 0 %}
-          {% assign product_2 = collection.products[1] %}
-          {% if product_2 %}
-            <a href="{{ product_2.url }}" class="ff-card group ff-landscape">
-              <div class="ff-image-wrap">
-                {% if product_2.featured_image %}
-                  {{
-                    product_2.featured_image
-                    | image_url: width: 1000
-                    | image_tag: loading: 'lazy', class: 'ff-image'
-                  }}
-                {% else %}
-                  {{ 'product-2' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
-                {% endif %}
-              </div>
-              <div class="ff-meta">
-                <h3 class="ff-title">{{ product_2.title }}</h3>
-                <p class="ff-price">{{ product_2.price | money }}</p>
-              </div>
-            </a>
-          {% endif %}
-
-          {% assign product_3 = collection.products[2] %}
-          {% if product_3 %}
-            <a href="{{ product_3.url }}" class="ff-card group ff-square">
-              <div class="ff-image-wrap">
-                {% if product_3.featured_image %}
-                  {{ product_3.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', class: 'ff-image' }}
-                {% else %}
-                  {{ 'product-3' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
-                {% endif %}
-              </div>
-              <div class="ff-meta">
-                <h3 class="ff-title">{{ product_3.title }}</h3>
-                <p class="ff-price">{{ product_3.price | money }}</p>
-              </div>
-            </a>
-          {% endif %}
+          {% for product in collection.products limit: 9 %}
+            {% assign mod = forloop.index0 | modulo: 3 %}
+            {% if mod != 0 %}
+              {% assign shape = 'ff-landscape' %}
+              {% if mod == 2 %}{% assign shape = 'ff-square' %}{% endif %}
+              <a href="{{ product.url }}" class="ff-card group {{ shape }}">
+                <div class="ff-image-wrap">
+                  {% if product.featured_image %}
+                    {{ product.featured_image | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'ff-image' }}
+                  {% else %}
+                    {% assign placeholder_idx = forloop.index0 | modulo: 6 | plus: 1 %}
+                    {{ 'product-' | append: placeholder_idx | placeholder_svg_tag: 'ff-image placeholder-svg' }}
+                  {% endif %}
+                </div>
+                <div class="ff-meta">
+                  <h3 class="ff-title">{{ product.title }}</h3>
+                  <p class="ff-price">{{ product.price | money }}</p>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
         {% else %}
           <a href="#" class="ff-card group ff-landscape">
             <div class="ff-image-wrap">
@@ -189,7 +176,7 @@
   /* Grid Layout */
   .ff-grid {
     display: flex;
-    gap: 80px;
+    gap: 60px;
     align-items: flex-start;
   }
   .ff-col {
@@ -249,14 +236,12 @@
     /* Massive border radius for pill/capsule shapes */
     border-radius: 3rem;
     /* Ethereal floating shadow */
-    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.06);
     transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.8s ease, border-radius 0.8s ease;
     background-color: var(--color-surface-soft);
   }
 
   .ff-card:hover .ff-image-wrap {
     transform: translateY(-8px);
-    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.12);
     border-radius: 2rem; /* Morphing shape slightly */
   }
   .ff-card:active .ff-image-wrap {

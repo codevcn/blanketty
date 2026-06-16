@@ -3,122 +3,200 @@
   assign heading = section.settings.heading | default: 'Họa tiết sáng tạo'
 %}
 
-<section class="cp-awwwards" id="Creative-{{ section.id }}">
-  <div class="cp-container">
+<section class="cp-awwwards-flush" id="Creative-{{ section.id }}">
+  <div class="cp-header-wrapper">
     <div class="cp-header">
       <div class="cp-eyebrow">Thiết kế giới hạn</div>
       <h2 class="cp-heading">{{ heading | escape }}</h2>
     </div>
+  </div>
 
-    {% if collection != blank and collection.products_count > 0 %}
-      <div class="cp-bento">
-        <!-- Hero Product (Bento Cell 1 - Large) -->
-        {% assign hero_product = collection.products[0] %}
-        {% if hero_product %}
-          <a href="{{ hero_product.url }}" class="cp-card cp-card--large group">
-            <div class="cp-shell">
-              <div class="cp-core">
-                {% if hero_product.featured_image %}
-                  {{
-                    hero_product.featured_image
-                    | image_url: width: 1200
-                    | image_tag: loading: 'lazy', class: 'cp-image'
-                  }}
-                {% endif %}
-                <div class="cp-meta-outside">
-                  <h3 class="cp-title">{{ hero_product.title }}</h3>
-                  <p class="cp-price">{{ hero_product.price | money }}</p>
-                </div>
-              </div>
+  {% if collection != blank and collection.products_count > 0 %}
+    <div class="cp-flush-grid">
+      {% for product in collection.products limit: 6 %}
+        <a href="{{ product.url }}" class="cp-card group">
+          <div class="cp-image-wrap">
+            {% if product.featured_image %}
+              {{ product.featured_image | image_url: width: 1200 | image_tag: loading: 'lazy', class: 'cp-image' }}
+            {% else %}
+              {% assign placeholder_idx = forloop.index0 | modulo: 6 | plus: 1 %}
+              {{ 'product-' | append: placeholder_idx | placeholder_svg_tag: 'cp-image placeholder-svg' }}
+            {% endif %}
+            
+            <div class="cp-floating-box">
+              <h3 class="cp-title">{{ product.title }}</h3>
+              <p class="cp-price">{{ product.price | money }}</p>
             </div>
-          </a>
-        {% endif %}
-
-        <!-- Secondary Product 1 (Bento Cell 2 - Small) -->
-        {% assign sec_product_1 = collection.products[1] %}
-        {% if sec_product_1 %}
-          <a href="{{ sec_product_1.url }}" class="cp-card cp-card--small group">
-            <div class="cp-shell">
-              <div class="cp-core">
-                {% if sec_product_1.featured_image %}
-                  {{
-                    sec_product_1.featured_image
-                    | image_url: width: 800
-                    | image_tag: loading: 'lazy', class: 'cp-image'
-                  }}
-                {% endif %}
-                <div class="cp-meta-outside">
-                  <h4 class="cp-title-small">{{ sec_product_1.title }}</h4>
-                  <p class="cp-price-small">{{ sec_product_1.price | money }}</p>
-                </div>
-              </div>
-            </div>
-          </a>
-        {% endif %}
-
-        <!-- Secondary Product 2 (Bento Cell 3 - Vertical) -->
-        {% assign sec_product_2 = collection.products[2] %}
-        {% if sec_product_2 %}
-          <a href="{{ sec_product_2.url }}" class="cp-card cp-card--vertical group">
-            <div class="cp-shell">
-              <div class="cp-core">
-                {% if sec_product_2.featured_image %}
-                  {{
-                    sec_product_2.featured_image
-                    | image_url: width: 800
-                    | image_tag: loading: 'lazy', class: 'cp-image'
-                  }}
-                {% endif %}
-                <div class="cp-meta-outside">
-                  <h4 class="cp-title-small">{{ sec_product_2.title }}</h4>
-                  <p class="cp-price-small">{{ sec_product_2.price | money }}</p>
-                </div>
-              </div>
-            </div>
-          </a>
-        {% endif %}
-      </div>
-    {% else %}
-      <div class="cp-empty">
-        <p>Vui lòng tạo collection "hoa-tiet-doc-dao-sang-tao" và thêm sản phẩm.</p>
-      </div>
-    {% endif %}
-
-    <div class="cp-view-all-wrapper">
-      <a href="{{ collection.url }}" class="cp-view-all-btn">
-        <span class="btn-text">Xem tất cả</span>
-        <span class="btn-icon-wrapper">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M1 13L13 1M13 1H4M13 1V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>
-      </a>
+          </div>
+        </a>
+      {% endfor %}
     </div>
+  {% else %}
+    <!-- dummy products -->
+    <div class="cp-flush-grid">
+      {% for i in (1..6) %}
+        <a href="#" class="cp-card group">
+          <div class="cp-image-wrap">
+            {% assign placeholder_idx = i | modulo: 6 | plus: 1 %}
+            {{ 'product-' | append: placeholder_idx | placeholder_svg_tag: 'cp-image placeholder-svg' }}
+            
+            <div class="cp-floating-box">
+              <h3 class="cp-title">Sản phẩm mẫu {{ i }}</h3>
+              <p class="cp-price">2,000,000₫</p>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="cp-view-all-wrapper">
+    <a href="{{ collection.url | default: '#' }}" class="cp-view-all-btn">
+      <span class="btn-text">Xem tất cả</span>
+      <span class="btn-icon-wrapper">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 13L13 1M13 1H4M13 1V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+    </a>
   </div>
 </section>
 
 <style>
   /* Base Reset for Section */
-  .cp-awwwards {
-    background-color: var(--color-canvas);
-    padding: 100px 0; /* Massive macro-whitespace */
+  .cp-awwwards-flush {
+    background-color: var(--color-canvas, #ffffff);
+    padding: 100px 0; /* Macro whitespace */
     overflow: hidden;
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
   }
-  .cp-awwwards a {
+
+  .cp-awwwards-flush a {
     color: inherit;
     text-decoration: none;
   }
-  .cp-container {
+
+  .cp-header-wrapper {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 32px;
+    margin-bottom: 50px;
   }
 
+  /* Header styles */
+  .cp-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .cp-eyebrow {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background-color: rgba(0, 0, 0, 0.04);
+    font-family: var(--font-family-body);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--color-muted);
+  }
+  .cp-heading {
+    font-family: var(--font-family-display);
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    margin: 0;
+    color: var(--color-ink);
+  }
+
+  /* Flush Grid */
+  .cp-flush-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    width: 100%;
+  }
+
+  .cp-card {
+    position: relative;
+    display: block;
+    aspect-ratio: 16/11; /* landscape as requested */
+    overflow: hidden;
+    background-color: var(--color-surface-soft);
+  }
+
+  .cp-image-wrap {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cp-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .cp-card:hover .cp-image {
+    transform: scale(1.05);
+  }
+
+  /* Floating Box */
+  .cp-floating-box {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 16px 24px;
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.6s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .cp-card:hover .cp-floating-box {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .cp-title {
+    font-family: var(--font-family-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-ink);
+    margin: 0 0 4px 0;
+    line-height: 1.3;
+  }
+  
+  .cp-price {
+    font-family: var(--font-family-body);
+    font-size: 1rem;
+    color: var(--color-muted);
+    margin: 0;
+  }
+
+  /* View All Button */
   .cp-view-all-wrapper {
     display: flex;
     justify-content: center;
-    margin-top: 50px;
-    margin-bottom: 20px;
+    margin-top: 60px;
   }
 
   .cp-view-all-btn {
@@ -127,24 +205,22 @@
     gap: 16px;
     padding: 8px 8px 8px 32px;
     background-color: var(--color-ink);
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-pill, 9999px);
     color: var(--color-canvas) !important;
-    text-decoration: none;
-    font-size: var(--text-button-size);
-    font-weight: var(--text-button-weight);
+    font-size: var(--text-button-size, 14px);
+    font-weight: var(--text-button-weight, 600);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s;
   }
 
   .cp-view-all-btn:hover {
     transform: scale(0.98);
-    background-color: var(--color-primary-active);
   }
 
   .cp-view-all-btn .btn-icon-wrapper {
     width: 40px;
     height: 40px;
     background-color: rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-full, 9999px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -157,196 +233,18 @@
     color: var(--color-ink);
   }
 
-  /* Typography */
-  .cp-header {
-    margin-bottom: 40px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .cp-eyebrow {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 9999px;
-    background-color: rgba(0, 0, 0, 0.04);
-    font-family: var(--font-family-body);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-weight: 600;
-    margin-bottom: 24px;
-    color: var(--color-muted);
-  }
-  .cp-heading {
-    font-family: var(--font-family-display);
-    font-size: clamp(3rem, 6vw, 5rem);
-    font-weight: 500;
-    line-height: 1.15;
-    letter-spacing: -0.04em;
-    margin: 0;
-    color: var(--color-ink);
-    max-width: 900px;
-  }
-
-  /* Layout: Asymmetrical Bento Grid */
-  .cp-bento {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-template-rows: auto auto;
-    gap: 32px;
-  }
-
-  /* Card Spans */
-  .cp-card--large {
-    grid-column: span 8;
-    grid-row: span 2;
-  }
-  .cp-card--small {
-    grid-column: span 4;
-    grid-row: span 1;
-  }
-  .cp-card--vertical {
-    grid-column: span 4;
-    grid-row: span 1;
-  }
-
-  /* Structuralism Cards */
-  .cp-card {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    text-decoration: none;
-  }
-  .cp-shell {
-    /* Floating ambient shadow */
-    border-radius: 2rem;
-    padding: 12px;
-    transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.8s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  .cp-card:hover .cp-shell {
-    transform: translateY(-8px);
-  }
-  .cp-card:active .cp-shell {
-    transform: scale(0.98);
-  }
-
-  .cp-core {
-    background-color: var(--color-surface-soft);
-    border-radius: calc(2rem - 12px);
-    overflow: hidden;
-    position: relative;
-    flex-grow: 1;
-    min-height: 300px;
-  }
-
-  /* Aspect ratios to force the grid shapes */
-  .cp-card--large .cp-core {
-    aspect-ratio: 16/10;
-  }
-  .cp-card--small .cp-core {
-    aspect-ratio: 4/3;
-  }
-  .cp-card--vertical .cp-core {
-    aspect-ratio: 4/5;
-  }
-
-  /* Image */
-  .cp-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 1.2s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-  .cp-card:hover .cp-image {
-    transform: scale(1.03);
-  }
-
-  /* Floating Meta Information */
-  .cp-meta-outside {
-    position: absolute;
-    bottom: 24px;
-    left: 24px;
-    right: 24px;
-    background: rgba(255, 250, 240, 0.9); /* canvas color with opacity */
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 20px 24px;
-    border-radius: 1.25rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-  .cp-card:hover .cp-meta-outside {
-    transform: translateY(-4px);
-  }
-
-  .cp-title {
-    font-family: var(--font-family-display);
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-ink);
-    margin: 0 0 4px 0;
-    line-height: 1.3;
-  }
-  .cp-price {
-    font-family: var(--font-family-body);
-    font-size: 1.125rem;
-    color: var(--color-muted);
-    margin: 0;
-  }
-
-  .cp-title-small {
-    font-family: var(--font-family-body);
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--color-ink);
-    margin: 0 0 4px 0;
-    line-height: 1.3;
-  }
-  .cp-price-small {
-    font-family: var(--font-family-body);
-    font-size: 1rem;
-    color: var(--color-muted);
-    margin: 0;
-  }
-
-  .cp-empty {
-    text-align: center;
-    color: #888;
-    padding: 100px 0;
-  }
-
-  /* Mobile Collapse - Stack Everything */
+  /* Mobile Responsive */
   @media (max-width: 989px) {
-    .cp-awwwards {
-      padding: 80px 0;
+    .cp-awwwards-flush {
+      padding: 60px 0;
     }
-    .cp-header {
-      margin-bottom: 60px;
+    .cp-header-wrapper {
+      margin-bottom: 40px;
     }
-    .cp-bento {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
+    .cp-flush-grid {
+      grid-template-columns: 1fr; /* 1 column on mobile */
     }
-    .cp-card--large,
-    .cp-card--small,
-    .cp-card--vertical {
-      grid-column: span 12;
-      grid-row: auto;
-    }
-    .cp-card--large .cp-core,
-    .cp-card--small .cp-core,
-    .cp-card--vertical .cp-core {
-      aspect-ratio: 1/1; /* Normalize aspect ratio on mobile */
-    }
-    .cp-meta-outside {
+    .cp-floating-box {
       bottom: 16px;
       left: 16px;
       right: 16px;
@@ -357,7 +255,7 @@
 
 {% schema %}
 {
-  "name": "Creative Patterns Bento",
+  "name": "Creative Patterns Flush",
   "tag": "section",
   "settings": [
     {
@@ -369,7 +267,7 @@
   ],
   "presets": [
     {
-      "name": "Creative Patterns Bento"
+      "name": "Creative Patterns Flush Grid"
     }
   ]
 }

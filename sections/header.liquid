@@ -1,6 +1,7 @@
 <header>
   <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
+    {{ shop.name | link_to: routes.root_url -}}
+    <span>.</span>
   </h2>
 
   <div class="header__menu">
@@ -34,7 +35,9 @@
     justify-content: space-between;
   }
   header .header__title {
+    display: flex;
     font-size: 1.8rem;
+    font-weight: 700;
   }
   header a {
     position: relative;
