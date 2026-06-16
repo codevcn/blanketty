@@ -1,47 +1,562 @@
 {% comment %}
-  This section is used in the collection template to render collection page
-  listing all products within a collection.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+  Template: collection.liquid
+  Redesigned with High-End Visual Design principles (Editorial Minimalism).
 {% endcomment %}
 
-<h1>{{ collection.title }}</h1>
-
-<div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
-          %}
-        {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
-        </div>
+<section class="collection-page-section">
+  <!-- Macro-whitespace Header -->
+  <header class="collection-header">
+    <div class="collection-header__inner staggered-item" style="animation-delay: 0.1s;">
+      <div class="collection-eyebrow">
+        <span class="collection-eyebrow__line"></span>
+        <span class="collection-eyebrow__text">BỘ SƯU TẬP</span>
+        <span class="collection-eyebrow__line"></span>
       </div>
-    {% endfor %}
+      <h1 class="collection-title">{{ collection.title }}</h1>
+      {% if collection.description != blank %}
+        <div class="collection-description text-muted">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+    </div>
+  </header>
 
-    {{ paginate | default_pagination }}
-  {% endpaginate %}
-</div>
+  <!-- Product Grid -->
+  <div class="collection-grid-container">
+    {% paginate collection.products by 12 %}
+      {% if collection.products.size == 0 %}
+        <div class="collection-empty staggered-item" style="animation-delay: 0.2s;">
+          <p>Chưa có sản phẩm nào trong bộ sưu tập này.</p>
+        </div>
+      {% else %}
+        <div class="collection-grid">
+          {% for product in collection.products %}
+            {% assign delay = forloop.index | times: 0.05 | plus: 0.15 %}
+            <div
+              class="collection-card hover-gallery group staggered-item"
+              style="animation-delay: {{ delay }}s;"
+            >
+              <a href="{{ product.url }}" class="collection-card__link" aria-label="{{ product.title }}"></a>
+              <div class="collection-card__image-wrap">
+                {% if product.images.size > 0 %}
+                  {% for image in product.images %}
+                    {% assign img_class = 'collection-card__image hover-gallery__image' %}
+                    {% if forloop.first %}
+                      {% assign img_class = img_class | append: ' is-active' %}
+                    {% endif %}
+                    {{ image | image_url: width: 800 | image_tag: loading: 'lazy', class: img_class }}
+                  {% endfor %}
+                {% else %}
+                  {{ 'product-1' | placeholder_svg_tag: 'collection-card__image placeholder-svg' }}
+                {% endif %}
+
+                <!-- Quick Actions Box -->
+                <div class="collection-card__quick-actions">
+                  {% if product.available %}
+                    <form method="post" action="/cart/add" class="quick-add-form">
+                      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                      <button type="button" class="quick-add-btn" title="Thêm vào giỏ">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M9 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z"/><path d="M20 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        </svg>
+                      </button>
+                    </form>
+                  {% else %}
+                    <button class="quick-add-btn disabled-btn" disabled title="Hết hàng">
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="collection-card__meta">
+                <div class="collection-card__info">
+                  <h3 class="collection-card__title">{{ product.title }}</h3>
+                  <p class="collection-card__vendor caption-uppercase text-muted">
+                    {{ product.vendor | default: shop.name }}
+                  </p>
+                </div>
+
+                <div class="collection-card__price-wrapper">
+                  {% assign current_variant = product.selected_or_first_available_variant %}
+                  {% if current_variant.compare_at_price > current_variant.price %}
+                    <span class="collection-card__price">{{ current_variant.price | money }}</span>
+                    <s class="collection-card__price-compare text-muted">
+                      {{- current_variant.compare_at_price | money -}}
+                    </s>
+                  {% else %}
+                    <span class="collection-card__price">{{ current_variant.price | money }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if paginate.pages > 1 %}
+        <div class="collection-pagination staggered-item" style="animation-delay: 1s;">
+          {{ paginate | default_pagination }}
+        </div>
+      {% endif %}
+    {% endpaginate %}
+  </div>
+</section>
 
 {% stylesheet %}
-  .collection-products {
+  .collection-page-section {
+    background-color: var(--color-canvas);
+    padding-bottom: 120px;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .collection-header {
+    display: flex;
+    justify-content: center;
+    padding: 110px 0px 140px;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .collection-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    opacity: 0.6;
+  }
+
+  .collection-eyebrow__line {
+    width: 24px;
+    height: 1px;
+    background-color: var(--color-ink);
+  }
+
+  .collection-eyebrow__text {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .collection-title {
+    margin-bottom: 32px;
+    font-size: clamp(3rem, 3vw, 5rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  .collection-description {
+    font-size: var(--text-body-lg-size);
+    line-height: 1.6;
+    text-wrap: balance;
+  }
+
+  /* Container */
+  .collection-grid-container {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* Grid */
+  .collection-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px 30px;
+  }
+
+  @media (max-width: 1024px) {
+    .collection-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px 40px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .collection-header {
+      padding: 60px 20px 40px;
+    }
+    .collection-grid-container {
+      padding: 0 20px;
+    }
+    .collection-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+
+  /* Card */
+  .collection-card {
+    display: block;
+    color: inherit;
+    position: relative;
+  }
+
+  .collection-card__link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+  }
+
+  .collection-card__quick-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 6px;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 5;
+  }
+
+  .collection-card:hover .collection-card__quick-actions {
+    transform: translateY(0);
+  }
+
+  .quick-add-form {
+    margin: 0;
+  }
+
+  .quick-add-btn {
+    width: 40px;
+    height: 40px;
+    background-color: var(--color-surface-soft);
+    color: var(--color-ink);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, background-color 0.2s, color 0.2s;
+  }
+
+  .quick-add-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .quick-add-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .quick-add-btn.success-state {
+    background-color: #10b981;
+    color: #fff;
+  }
+
+  .collection-card__image-wrap {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--color-surface);
+    aspect-ratio: 4 / 5;
+    margin-bottom: var(--space-md);
+    box-shadow: inset 0 0 0 1px var(--color-hairline), 0 20px 40px -10px rgba(0, 0, 0, 0.03);
+  }
+
+  .collection-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  .hover-gallery {
+    position: relative;
+  }
+
+  .hover-gallery__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hover-gallery__image.is-active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+  }
+
+  .collection-card:hover .hover-gallery__image.is-active {
+    transform: scale(1.05);
+  }
+
+  .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    fill: #e0e0e0;
+    padding: 4rem;
+  }
+
+  /* Meta info */
+  .collection-card__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-md);
+    padding: 0 4px;
+  }
+
+  .collection-card__info {
+    flex: 1;
+  }
+
+  .collection-card__title {
+    font-size: var(--text-body-lg-size);
+    font-weight: 500;
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .collection-card__vendor {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .collection-card__price-wrapper {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .collection-card__price {
+    font-size: var(--text-body-lg-size);
+    font-weight: 500;
+  }
+
+  .collection-card__price-compare {
+    font-size: var(--text-body-sm-size);
+    margin-top: 2px;
+    text-decoration-color: black;
+  }
+
+  /* Empty State */
+  .collection-empty {
+    text-align: center;
+    padding: 80px 0;
+    color: var(--color-muted);
+    font-size: var(--text-body-lg-size);
+  }
+
+  /* Pagination */
+  .collection-pagination {
+    margin-top: 100px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .collection-pagination .pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .collection-pagination .page,
+  .collection-pagination .prev,
+  .collection-pagination .next {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .collection-pagination .page:hover,
+  .collection-pagination .prev:hover,
+  .collection-pagination .next:hover {
+    background-color: var(--color-surface-soft);
+    transform: translateY(-1px);
+  }
+
+  .collection-pagination .current {
+    background-color: var(--color-ink);
+    color: var(--color-canvas);
+  }
+
+  .collection-pagination .deco {
+    color: var(--color-muted);
+    margin: 0 4px;
+  }
+
+  /* Animation */
+  .staggered-item {
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 {% endstylesheet %}
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.hover-gallery');
+
+    cards.forEach((card) => {
+      const images = card.querySelectorAll('.hover-gallery__image');
+      if (images.length <= 1) return;
+
+      let currentIndex = 0;
+      let intervalId = null;
+
+      const nextImage = () => {
+        images[currentIndex].classList.remove('is-active');
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].classList.add('is-active');
+      };
+
+      card.addEventListener('mouseenter', () => {
+        // Immediate transition to the second image
+        nextImage();
+        // Then loop based on section settings
+        const intervalTime = {{ section.settings.gallery_interval | default: 2 | times: 1000 }};
+        intervalId = setInterval(nextImage, intervalTime);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        clearInterval(intervalId);
+        // Reset to first image instantly
+        images[currentIndex].classList.remove('is-active');
+        currentIndex = 0;
+        images[0].classList.add('is-active');
+      });
+    });
+
+    // Quick Add to Cart AJAX
+    document.querySelectorAll('.quick-add-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const form = btn.closest('form');
+        if (!form) return;
+
+        const originalContent = btn.innerHTML;
+        btn.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="0.75"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/></path></svg>';
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((item) => {
+            btn.innerHTML =
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            btn.classList.add('success-state');
+
+            fetch(window.Shopify.routes.root + 'cart.js')
+              .then((res) => res.json())
+              .then((cartState) => {
+                const headerBadge = document.querySelector('.header-cart-badge');
+                if (headerBadge) {
+                  headerBadge.textContent = cartState.items.length;
+                } else if (cartState.items.length > 0) {
+                  const cartLink = document.querySelector('.header-cart-link');
+                  if (cartLink) {
+                    const sup = document.createElement('sup');
+                    sup.className = 'header-cart-badge';
+                    sup.textContent = cartState.items.length;
+                    cartLink.insertBefore(sup, cartLink.firstChild);
+                  }
+                }
+              });
+
+            setTimeout(() => {
+              btn.innerHTML = originalContent;
+              btn.disabled = false;
+              btn.classList.remove('success-state');
+            }, 2000);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+            btn.innerHTML =
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            setTimeout(() => {
+              btn.innerHTML = originalContent;
+              btn.disabled = false;
+            }, 2000);
+          });
+      });
+    });
+  });
+</script>
+
 {% schema %}
 {
-  "name": "t:general.collection",
-  "settings": []
+  "name": "Danh sách sản phẩm",
+  "settings": [
+    {
+      "type": "range",
+      "id": "gallery_interval",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "label": "Thời gian chuyển tiếp ảnh",
+      "default": 2
+    }
+  ]
 }
 {% endschema %}

@@ -14,7 +14,14 @@
       <!-- Card 1: Visual Texture (Large) -->
       <div class="bento-card bento-card--large bento-shell">
         <div class="bento-core">
-          <img src="{{ 'texture_close_1781537790255.png' | asset_url }}" alt="Soft Texture" class="bento-img" loading="lazy" width="600" height="800">
+          <img
+            src="{{ 'texture_close_1781537790255.png' | asset_url }}"
+            alt="Soft Texture"
+            class="bento-img"
+            loading="lazy"
+            width="600"
+            height="800"
+          >
           <div class="bento-content-overlay">
             <h3>Chất liệu êm ái</h3>
             <p>An toàn cho da, giữ ấm nhưng vẫn thoáng khí.</p>
@@ -27,7 +34,18 @@
         <div class="bento-core bg-sand text-ink">
           <div class="bento-content-padded">
             <span class="bento-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
             </span>
             <h3>Thân thiện với môi trường</h3>
             <p>Sợi bông dệt tự nhiên, quy trình sản xuất không hóa chất độc hại.</p>
@@ -40,7 +58,18 @@
         <div class="bento-core bg-sage text-ink">
           <div class="bento-content-padded">
             <span class="bento-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5"/></svg>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5"/>
+              </svg>
             </span>
             <h3>Đa dạng kích thước</h3>
             <p>Phù hợp cho cả giường đơn, giường đôi, sofa hoặc mang đi du lịch.</p>
@@ -51,30 +80,37 @@
       <!-- Card 4: Lifestyle (Wide) -->
       <div class="bento-card bento-card--wide bento-shell">
         <div class="bento-core">
-          <img src="{{ 'cozy_lifestyle_1781537827471.png' | asset_url }}" alt="Lifestyle" class="bento-img" loading="lazy" width="1200" height="800">
+          <img
+            src="{{ 'cozy_lifestyle_1781537827471.png' | asset_url }}"
+            alt="Lifestyle"
+            class="bento-img"
+            loading="lazy"
+            width="1200"
+            height="800"
+          >
           <div class="bento-content-overlay bento-content-overlay--dark">
             <h3>Cảm giác như ở nhà</h3>
             <p>Một lớp chăn tạo nên không gian nghỉ ngơi thư giãn tuyệt đối.</p>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
 <style>
   .bento-benefits {
-    padding: calc(var(--page-margin) * 4) var(--page-margin);
+    padding: calc(var(--page-margin) * 2) var(--page-margin);
     background-color: var(--color-background);
+    margin-bottom: 4rem;
+    border-radius: 28px;
   }
   .bento-inner {
     max-width: var(--page-width);
     margin: 0 auto;
   }
   .bento-header {
-    margin-bottom: 4rem;
-    max-width: 60ch;
+    margin-bottom: 3rem;
   }
   .bento-heading {
     font-family: var(--font-heading);
@@ -82,15 +118,17 @@
     color: var(--color-foreground);
     line-height: 1.2;
     font-weight: 400;
+    width: max-content;
+    margin: 0 auto;
   }
-  
+
   .bento-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: minmax(280px, auto);
     gap: 1.5rem;
   }
-  
+
   /* Bento Shell (Double Bezel) */
   .bento-shell {
     background-color: var(--color-surface-shell);
@@ -108,26 +146,37 @@
     display: flex;
     flex-direction: column;
   }
-  
-  .bg-sand { background-color: var(--color-brand-sand); }
-  .bg-sage { background-color: var(--color-brand-sage); }
-  .text-ink { color: var(--color-foreground); }
-  
+
+  .bg-sand {
+    background-color: var(--color-brand-sand);
+  }
+  .bg-sage {
+    background-color: var(--color-brand-sage);
+  }
+  .text-ink {
+    color: var(--color-foreground);
+  }
+
   .bento-img {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     transition: transform 1.2s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .bento-shell:hover .bento-img {
     transform: scale(1.04);
   }
-  
+
   .bento-content-overlay {
     position: absolute;
-    bottom: 0; left: 0; width: 100%;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     padding: 2rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
     color: var(--color-surface-white);
   }
   .bento-content-overlay h3 {
@@ -141,7 +190,7 @@
     margin: 0;
     opacity: 0.9;
   }
-  
+
   .bento-content-padded {
     padding: 2rem;
     display: flex;

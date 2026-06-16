@@ -1,52 +1,947 @@
 {% comment %}
-  This section is used in the product template to render product page with
-  media, content, and add-to-cart form.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/product
+  High-End Product Section - Redesign with advanced fields
 {% endcomment %}
 
-<div class="product-images">
-  {% for image in product.images %}
-    {% render 'image', class: 'product-image', image: image %}
-  {% endfor %}
-</div>
+<section class="pdp-split" id="MainProduct-{{ section.id }}" data-section="{{ section.id }}">
+  <!-- Left Column: Sticky Gallery -->
+  <div class="pdp-gallery staggered-gallery">
+    <div class="pdp-gallery__inner">
+      {% if product.images.size > 0 %}
+        {% for image in product.images %}
+          <div class="pdp-gallery__item">
+            <img
+              src="{{ image | image_url: width: 1200 }}"
+              alt="{{ image.alt | escape | default: product.title }}"
+              width="1200"
+              height="{{ 1200 | divided_by: image.aspect_ratio | round }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              class="pdp-gallery__image"
+            >
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="pdp-gallery__item">
+          {{ 'product-1' | placeholder_svg_tag: 'pdp-gallery__image placeholder-svg' }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
 
-<div class="product-info">
-  <h1>{{ product.title }}</h1>
-  <p>{{ product.price | money }}</p>
-  <p>{{ product.description }}</p>
-</div>
+  <!-- Right Column: Scrollable Product Info -->
+  <div class="pdp-info">
+    <div class="pdp-info__inner">
+      
+      <!-- Type & Vendor Eyebrow -->
+      <div class="pdp-info__eyebrow staggered-item">
+        {% if product.type != blank %}
+          <span class="pdp-badge">{{ product.type }}</span>
+        {% endif %}
+        {% if product.vendor != blank %}
+          {% if product.type != blank %}<span class="pdp-eyebrow-separator">/</span>{% endif %}
+          <span class="pdp-info__vendor caption-uppercase text-muted">{{ product.vendor }}</span>
+        {% endif %}
+      </div>
 
-<div class="product-form">
-  {% form 'product', product %}
-    {% assign current_variant = product.selected_or_first_available_variant %}
+      <!-- Title -->
+      <h1 class="pdp-info__title display-md text-balance staggered-item">
+        {{ product.title }}
+      </h1>
 
-    <select name="id">
-      {% for variant in product.variants %}
-        <option
-          value="{{ variant.id }}"
-          {% if variant == current_variant %}
-            selected="selected"
+      {% assign current_variant = product.selected_or_first_available_variant %}
+
+      <!-- Price -->
+      <div class="pdp-info__price-block staggered-item" id="price-{{ section.id }}">
+        {% if current_variant.compare_at_price > current_variant.price %}
+          <span class="pdp-info__price title-lg">{{ current_variant.price | money }}</span>
+          <s class="pdp-info__price-compare title-md text-muted">{{ current_variant.compare_at_price | money }}</s>
+          {% assign savings = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round %}
+          <span class="pdp-save-badge">Tiết kiệm {{ savings }}%</span>
+        {% else %}
+          <span class="pdp-info__price title-lg">{{ current_variant.price | money }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Inventory Quantity -->
+      <div class="pdp-inventory staggered-item" id="inventory-{{ section.id }}">
+        {% if current_variant.inventory_management == 'shopify' and current_variant.inventory_quantity > 0 %}
+          <span class="pdp-inventory-dot in-stock"></span> Còn {{ current_variant.inventory_quantity }} sản phẩm
+        {% elsif current_variant.available == false %}
+          <span class="pdp-inventory-dot out-of-stock"></span> Hết hàng
+        {% endif %}
+      </div>
+
+      <!-- Form -->
+      <div class="pdp-info__form-wrapper staggered-item">
+        {% form 'product', product, id: 'product-form-installment', class: 'pdp-form' %}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" id="variant-id-{{ section.id }}">
+
+          <!-- Variants -->
+          {% unless product.has_only_default_variant %}
+            <div class="pdp-variants">
+              {% for option in product.options_with_values %}
+                {% assign is_color = false %}
+                {% assign downcased_option = option.name | downcase %}
+                {% if downcased_option contains 'màu' or downcased_option contains 'color' or downcased_option contains 'colour' %}
+                  {% assign is_color = true %}
+                {% endif %}
+                <fieldset class="pdp-variant-group">
+                  <legend class="pdp-variant-name caption-uppercase">{{ option.name }}</legend>
+                  <div class="pdp-variant-options {% if is_color %}pdp-variant-options--color{% endif %}">
+                    {% for value in option.values %}
+                      <input 
+                        type="radio" 
+                        id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                        name="options[{{ option.name | escape }}]"
+                        value="{{ value | escape }}"
+                        class="pdp-variant-input visually-hidden"
+                        {% if option.selected_value == value %}checked{% endif %}
+                      >
+                      <label 
+                        for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+                        class="pdp-variant-label {% if is_color %}pdp-variant-label--color{% endif %}"
+                        {% if is_color %}style="background-color: {{ value | downcase | replace: ' ', '' }};" title="{{ value }}"{% endif %}
+                      >
+                        {% unless is_color %}
+                          {{ value }}
+                        {% endunless %}
+                      </label>
+                    {% endfor %}
+                  </div>
+                </fieldset>
+              {% endfor %}
+            </div>
+          {% endunless %}
+
+          <!-- Quantity -->
+          <div class="pdp-quantity-group">
+            <label class="pdp-quantity-label caption-uppercase" for="Quantity-{{ section.id }}">Số lượng</label>
+            <div class="pdp-quantity-selector">
+              <button type="button" class="pdp-qty-btn" name="minus" data-action="minus">-</button>
+              <input type="number" name="quantity" id="Quantity-{{ section.id }}" min="1" value="1" class="pdp-qty-input">
+              <button type="button" class="pdp-qty-btn" name="plus" data-action="plus">+</button>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="pdp-actions">
+            <button
+              type="submit"
+              name="add"
+              class="btn btn-primary w-full pdp-add-to-cart"
+              {% if current_variant.available == false %}disabled{% endif %}
+              id="AddToCart-{{ section.id }}"
+            >
+              <span class="pdp-add-to-cart-text">
+                {% if current_variant.available %}
+                  Thêm vào giỏ hàng
+                {% else %}
+                  Hết hàng
+                {% endif %}
+              </span>
+            </button>
+            
+            {% if section.settings.show_dynamic_checkout %}
+              {{ form | payment_button }}
+            {% endif %}
+          </div>
+        {% endform %}
+      </div>
+
+      {% if product.tags.size > 0 %}
+        <div class="pdp-info-cards staggered-item">
+          
+          <!-- Shipping Card -->
+          <div class="pdp-info-card">
+            <div class="pdp-info-card-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            </div>
+            <div class="pdp-info-card-title caption-uppercase">Vận chuyển</div>
+            <div class="pdp-info-card-content body-sm text-muted" style="line-height: 1.6;">
+              <strong style="color: var(--color-ink)">Giao hàng tiêu chuẩn</strong><br>
+              3 - 5 ngày làm việc<br><br>
+              Hỗ trợ kiểm tra hàng trước khi thanh toán.
+            </div>
+          </div>
+
+          <!-- Tags Card -->
+          {% if product.tags.size > 0 %}
+            <div class="pdp-info-card">
+              <div class="pdp-info-card-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+              </div>
+              <div class="pdp-info-card-title caption-uppercase">Từ khóa</div>
+              <div class="pdp-tags">
+                {% for tag in product.tags %}
+                  <span class="pdp-tag">{{ tag }}</span>
+                {% endfor %}
+              </div>
+            </div>
           {% endif %}
-        >
-          {{ variant.title }} - {{ variant.price | money }}
-        </option>
-      {% endfor %}
-    </select>
+          
+        </div>
+      {% endif %}
 
-    <input type="text" name="quantity" min="1" value="1">
+    </div>
+  </div>
+</section>
 
-    <input type="submit" value="Add to cart">
-    {{ form | payment_button }}
-  {% endform %}
-</div>
+<!-- Full Width Description Section -->
+{% if product.description != blank %}
+  <section class="pdp-description-full section">
+    <div class="container">
+      <div class="pdp-description-full__inner">
+        <h2 class="title-lg pdp-description-full__title">Mô tả sản phẩm</h2>
+        <div class="pdp-description-full__content body-md text-muted">
+          {{ product.description }}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+<!-- JSON Data for JS Variants Logic -->
+<script type="application/json" id="ProductJson-{{ section.id }}">
+  [
+    {% for variant in product.variants %}
+      {
+        "id": {{ variant.id | json }},
+        "option1": {{ variant.option1 | json }},
+        "option2": {{ variant.option2 | json }},
+        "option3": {{ variant.option3 | json }},
+        "price": {{ variant.price | json }},
+        "compare_at_price": {{ variant.compare_at_price | json }},
+        "available": {{ variant.available | json }},
+        "inventory_management": {{ variant.inventory_management | json }},
+        "inventory_policy": {{ variant.inventory_policy | json }},
+        "inventory_quantity": {{ variant.inventory_quantity | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sectionId = '{{ section.id }}';
+    const variantInputs = document.querySelectorAll('.pdp-variant-input');
+    const variantIdInput = document.getElementById(`variant-id-${sectionId}`);
+    const productJsonNode = document.getElementById(`ProductJson-${sectionId}`);
+    if (!productJsonNode) return;
+    const productJson = JSON.parse(productJsonNode.textContent);
+    console.log("🔥 Product Variants Data:", productJson);
+    
+    const addToCartBtn = document.getElementById(`AddToCart-${sectionId}`);
+    const addToCartText = addToCartBtn.querySelector('.pdp-add-to-cart-text');
+    const priceBlock = document.getElementById(`price-${sectionId}`);
+    const inventoryBlock = document.getElementById(`inventory-${sectionId}`);
+    const qtyInput = document.getElementById(`Quantity-${sectionId}`);
+
+    // Helper to format money (simple representation)
+    const formatMoney = (cents) => {
+      return (cents / 100).toLocaleString('vi-VN') + '₫';
+    };
+
+    // Variant Selection Logic
+    variantInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        const selectedOptions = Array.from(document.querySelectorAll('.pdp-variant-input:checked')).map(el => el.value);
+        
+        // Find matching variant
+        const matchedVariant = productJson.find(variant => {
+          return selectedOptions.every((option, index) => {
+            return variant[`option${index + 1}`] === option;
+          });
+        });
+
+        if (matchedVariant) {
+          // Update hidden input
+          variantIdInput.value = matchedVariant.id;
+          
+          // Update URL
+          window.history.replaceState({}, '', `${window.location.pathname}?variant=${matchedVariant.id}`);
+          
+          // Update Price
+          if (matchedVariant.compare_at_price > matchedVariant.price) {
+            priceBlock.innerHTML = `
+              <span class="pdp-info__price title-lg">${formatMoney(matchedVariant.price)}</span>
+              <s class="pdp-info__price-compare title-md text-muted">${formatMoney(matchedVariant.compare_at_price)}</s>
+            `;
+          } else {
+            priceBlock.innerHTML = `<span class="pdp-info__price title-lg">${formatMoney(matchedVariant.price)}</span>`;
+          }
+
+          // Update Inventory Text
+          if (matchedVariant.inventory_management === 'shopify' && matchedVariant.inventory_quantity > 0) {
+            inventoryBlock.textContent = `Còn ${matchedVariant.inventory_quantity} sản phẩm`;
+          } else if (!matchedVariant.available) {
+            inventoryBlock.textContent = 'Hết hàng';
+          } else {
+            inventoryBlock.textContent = ''; // In stock but no tracking
+          }
+
+          // Update Quantity Max
+          if (qtyInput) {
+            if (matchedVariant.inventory_management === 'shopify' && matchedVariant.inventory_policy !== 'continue') {
+              qtyInput.max = matchedVariant.inventory_quantity;
+              if (parseInt(qtyInput.value) > matchedVariant.inventory_quantity) {
+                qtyInput.value = Math.max(1, matchedVariant.inventory_quantity);
+              }
+            } else {
+              qtyInput.removeAttribute('max');
+            }
+          }
+
+          // Update Button State
+          if (matchedVariant.available) {
+            addToCartBtn.disabled = false;
+            addToCartText.textContent = 'Thêm vào giỏ hàng';
+          } else {
+            addToCartBtn.disabled = true;
+            addToCartText.textContent = 'Hết hàng';
+          }
+        } else {
+          // Combination not found
+          addToCartBtn.disabled = true;
+          addToCartText.textContent = 'Không có sẵn';
+          inventoryBlock.textContent = '';
+        }
+      });
+    });
+
+    // Trigger initial state
+    const firstCheckedInput = document.querySelector('.pdp-variant-input:checked');
+    if (firstCheckedInput) {
+      firstCheckedInput.dispatchEvent(new Event('change'));
+    }
+
+    // Quantity Logic
+    if (qtyInput) {
+      const minusBtn = qtyInput.parentElement.querySelector('[data-action="minus"]');
+      const plusBtn = qtyInput.parentElement.querySelector('[data-action="plus"]');
+
+      if (minusBtn && plusBtn) {
+        minusBtn.addEventListener('click', () => {
+          let val = parseInt(qtyInput.value) || 1;
+          if (val > 1) qtyInput.value = val - 1;
+        });
+        plusBtn.addEventListener('click', () => {
+          let val = parseInt(qtyInput.value) || 1;
+          let max = qtyInput.hasAttribute('max') ? parseInt(qtyInput.getAttribute('max')) : Infinity;
+          if (val < max) {
+            qtyInput.value = val + 1;
+          }
+        });
+      }
+
+      qtyInput.addEventListener('change', () => {
+        let val = parseInt(qtyInput.value) || 1;
+        let max = qtyInput.hasAttribute('max') ? parseInt(qtyInput.getAttribute('max')) : Infinity;
+        if (val > max) qtyInput.value = max;
+        if (val < 1) qtyInput.value = 1;
+      });
+    }
+
+    // AJAX Add to Cart Logic
+    const form = document.getElementById('product-form-installment');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const submitBtn = form.querySelector('.pdp-add-to-cart');
+        const originalText = addToCartText.textContent;
+        addToCartText.textContent = 'Đang thêm...';
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status) {
+            // Error handling (e.g. out of stock)
+            alert(data.description || 'Có lỗi xảy ra.');
+            addToCartText.textContent = originalText;
+            submitBtn.disabled = false;
+          } else {
+            // Success
+            addToCartText.textContent = 'Đã thêm vào giỏ hàng ✓';
+            submitBtn.classList.add('success-state'); // Optionally style success
+            
+            // Update Header Cart Badge
+            fetch(window.Shopify.routes.root + 'cart.js')
+              .then(res => res.json())
+              .then(cartState => {
+                const headerBadge = document.querySelector('.header-cart-badge');
+                if (headerBadge) {
+                  headerBadge.textContent = cartState.items.length;
+                } else if (cartState.items.length > 0) {
+                  const cartLink = document.querySelector('.header-cart-link');
+                  if (cartLink) {
+                    const sup = document.createElement('sup');
+                    sup.className = 'header-cart-badge';
+                    sup.textContent = cartState.items.length;
+                    cartLink.insertBefore(sup, cartLink.firstChild);
+                  }
+                }
+              });
+
+            setTimeout(() => {
+              addToCartText.textContent = originalText;
+              submitBtn.disabled = false;
+              submitBtn.classList.remove('success-state');
+            }, 2500);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          addToCartText.textContent = 'Có lỗi xảy ra';
+          setTimeout(() => {
+            addToCartText.textContent = originalText;
+            submitBtn.disabled = false;
+          }, 2000);
+        });
+      });
+    }
+  });
+</script>
+
+<style>
+  /* Base Architecture & Whitespace Maximization */
+  .pdp-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100dvh;
+    background-color: var(--color-canvas);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .staggered-gallery {
+    opacity: 0;
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .staggered-item {
+    opacity: 0;
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Stagger delays */
+  .pdp-info__inner > *:nth-child(1) { animation-delay: 0.1s; }
+  .pdp-info__inner > *:nth-child(2) { animation-delay: 0.15s; }
+  .pdp-info__inner > *:nth-child(3) { animation-delay: 0.2s; }
+  .pdp-info__inner > *:nth-child(4) { animation-delay: 0.25s; }
+  .pdp-info__inner > *:nth-child(5) { animation-delay: 0.3s; }
+  .pdp-info__inner > *:nth-child(6) { animation-delay: 0.35s; }
+  .pdp-info__inner > *:nth-child(7) { animation-delay: 0.4s; }
+  .pdp-info__inner > *:nth-child(8) { animation-delay: 0.45s; }
+
+  /* Gallery Column */
+  .pdp-gallery {
+    position: relative;
+    padding: var(--space-xl);
+  }
+  
+  .pdp-gallery__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+  
+  .pdp-gallery__item {
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px var(--color-hairline), 0 20px 40px -10px rgba(0,0,0,0.03);
+    background-color: var(--color-surface);
+  }
+
+  .pdp-gallery__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
+  .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    fill: #e0e0e0;
+    background-color: #fafafa;
+    padding: 4rem;
+  }
+
+  /* Info Column */
+  .pdp-info {
+    position: relative;
+    padding: var(--space-xl) var(--space-xl) var(--space-xl) var(--space-xl);
+  }
+  
+  .pdp-info__inner {
+    position: sticky;
+    top: 25px;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Eyebrow: Type & Vendor */
+  .pdp-info__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .pdp-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    background-color: var(--color-surface-soft);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-ink);
+  }
+
+  .pdp-eyebrow-separator {
+    color: var(--color-hairline);
+    font-size: 12px;
+  }
+
+  .pdp-info__vendor {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+  }
+
+  /* Typography */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .pdp-info__title {
+    margin-bottom: var(--space-md);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    font-weight: 500;
+  }
+
+  .pdp-info__price-block {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  
+  .pdp-info__price {
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  
+  .pdp-info__price-compare {
+    font-size: 1.25rem;
+    text-decoration-color: var(--color-hairline);
+  }
+
+  .pdp-save-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    background-color: var(--color-error);
+    color: #fff;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 4px;
+    transform: translateY(-2px);
+  }
+
+  .pdp-inventory {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+
+  .pdp-inventory-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .pdp-inventory-dot.in-stock {
+    background-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  }
+
+  .pdp-inventory-dot.out-of-stock {
+    background-color: var(--color-error);
+  }
+
+  /* Form & Variants */
+  .pdp-info__form-wrapper {
+    margin-bottom: var(--space-xl);
+    border-top: 1px solid var(--color-hairline);
+    padding-top: var(--space-xl);
+  }
+
+  .pdp-variants {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  .pdp-variant-group {
+    border: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .pdp-variant-name {
+    padding: 0;
+    margin-bottom: var(--space-sm);
+    color: var(--color-muted);
+  }
+
+  .pdp-variant-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip: rect(0 0 0 0);
+    word-wrap: normal !important;
+  }
+
+  .pdp-variant-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 24px;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-body-sm-size);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pdp-variant-label:hover {
+    border-color: var(--color-muted-soft);
+  }
+
+  .pdp-variant-input:checked + .pdp-variant-label:not(.pdp-variant-label--color) {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  /* Color Swatches */
+  .pdp-variant-options--color {
+    gap: 12px;
+  }
+  
+  .pdp-variant-label--color {
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    box-shadow: inset 0 0 0 1px var(--color-hairline);
+    background-color: var(--color-canvas); /* Overridden inline */
+  }
+
+  .pdp-variant-label--color:hover {
+    box-shadow: inset 0 0 0 1px var(--color-muted);
+    border-color: transparent;
+  }
+
+  .pdp-variant-input:checked + .pdp-variant-label--color {
+    border-color: var(--color-ink);
+    box-shadow: inset 0 0 0 3px var(--color-canvas);
+  }
+
+  /* Quantity */
+  .pdp-quantity-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+  }
+  
+  .pdp-quantity-label {
+    color: var(--color-muted);
+  }
+
+  .pdp-quantity-selector {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    height: 48px;
+    background-color: var(--color-surface);
+  }
+
+  .pdp-qty-btn {
+    background: none;
+    border: none;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-ink);
+    font-size: 1.2rem;
+    transition: color 0.2s;
+  }
+
+  .pdp-qty-btn:hover {
+    color: var(--color-primary);
+  }
+
+  .pdp-qty-input {
+    width: 40px;
+    text-align: center;
+    border: none;
+    background: none;
+    font-size: var(--text-body-sm-size);
+    font-weight: 600;
+    color: var(--color-ink);
+    -moz-appearance: textfield;
+  }
+  .pdp-qty-input::-webkit-outer-spin-button,
+  .pdp-qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .pdp-qty-input:focus {
+    outline: none;
+  }
+
+  /* Actions */
+  .pdp-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  
+  .w-full {
+    width: 100%;
+  }
+
+  /* Button Hover Physics */
+  .pdp-add-to-cart {
+    height: 56px;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .pdp-add-to-cart:hover:not(:disabled) {
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,0.15);
+  }
+
+  .pdp-add-to-cart:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  .pdp-add-to-cart::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .pdp-add-to-cart:hover:not(:disabled)::after {
+    opacity: 1;
+  }
+
+  /* Info Cards Grid */
+  .pdp-info-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  @media (min-width: 480px) {
+    .pdp-info-cards {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .pdp-info-card {
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    text-align: center;
+    background-color: var(--color-canvas);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pdp-info-card-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-md);
+    color: var(--color-ink);
+  }
+
+  .pdp-info-card-title {
+    margin-bottom: var(--space-sm);
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .pdp-info__description {
+    line-height: 1.6;
+  }
+
+  /* Full Width Description */
+  .pdp-description-full {
+    background-color: var(--color-canvas);
+    padding: var(--space-xxl) var(--space-md);
+  }
+
+  .pdp-description-full__inner {
+    padding: var(--space-xl);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-md);
+  }
+
+  .pdp-description-full__title {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .pdp-description-full__content {
+    line-height: 1.8;
+  }
+  
+  .pdp-description-full__content p {
+    margin-bottom: var(--space-md);
+  }
+
+  /* Tags */
+
+  .pdp-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .pdp-tag {
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-pill);
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 989px) {
+    .pdp-split {
+      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .pdp-gallery {
+      padding: var(--space-md);
+      padding-top: calc(var(--space-section));
+    }
+    
+    .pdp-gallery__item {
+      border-radius: var(--radius-lg);
+    }
+    
+    .pdp-info {
+      padding: var(--space-xl) var(--space-md);
+      padding-top: var(--space-lg);
+    }
+    
+    .pdp-info__inner {
+      position: relative;
+      top: 0;
+      max-width: 100%;
+    }
+  }
+</style>
 
 {% schema %}
 {
-  "name": "t:general.product",
-  "settings": [],
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  }
+  "name": "Product Main",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Show dynamic checkout buttons",
+      "info": "Lets customers check out directly using a familiar payment method. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+      "default": true
+    }
+  ]
 }
 {% endschema %}

@@ -47,7 +47,8 @@
   /* =========================================
      TYPOGRAPHY
      ========================================= */
-  --font-family-display: "Plain Black", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-display:
+    "Plain Black", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-family-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   /* Display XL */
@@ -150,7 +151,9 @@
    BASE RESET & GLOBAL STYLES
    ========================================= */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -171,7 +174,8 @@ body {
    TYPOGRAPHY CLASSES
    ========================================= */
 
-h1, .display-xl {
+h1,
+.display-xl {
   font-family: var(--font-family-display);
   font-size: var(--text-display-xl-size);
   font-weight: var(--text-display-xl-weight);
@@ -181,7 +185,8 @@ h1, .display-xl {
   margin: 0 0 var(--space-md);
 }
 
-h2, .display-lg {
+h2,
+.display-lg {
   font-family: var(--font-family-display);
   font-size: var(--text-display-lg-size);
   font-weight: var(--text-display-lg-weight);
@@ -191,7 +196,8 @@ h2, .display-lg {
   margin: 0 0 var(--space-md);
 }
 
-h3, .display-md {
+h3,
+.display-md {
   font-family: var(--font-family-display);
   font-size: var(--text-display-md-size);
   font-weight: var(--text-display-md-weight);
@@ -201,7 +207,8 @@ h3, .display-md {
   margin: 0 0 var(--space-md);
 }
 
-h4, .display-sm {
+h4,
+.display-sm {
   font-family: var(--font-family-display);
   font-size: var(--text-display-sm-size);
   font-weight: var(--text-display-sm-weight);
@@ -321,18 +328,37 @@ p {
   border-radius: var(--radius-xl);
   padding: var(--space-xl);
 }
-.card-pink { background-color: var(--color-brand-pink); color: var(--color-on-primary); }
-.card-teal { background-color: var(--color-brand-teal); color: var(--color-on-dark); }
-.card-lavender { background-color: var(--color-brand-lavender); color: var(--color-ink); }
-.card-peach { background-color: var(--color-brand-peach); color: var(--color-ink); }
-.card-ochre { background-color: var(--color-brand-ochre); color: var(--color-ink); }
-.card-cream { background-color: var(--color-surface-card); color: var(--color-ink); }
+.card-pink {
+  background-color: var(--color-brand-pink);
+  color: var(--color-on-primary);
+}
+.card-teal {
+  background-color: var(--color-brand-teal);
+  color: var(--color-on-dark);
+}
+.card-lavender {
+  background-color: var(--color-brand-lavender);
+  color: var(--color-ink);
+}
+.card-peach {
+  background-color: var(--color-brand-peach);
+  color: var(--color-ink);
+}
+.card-ochre {
+  background-color: var(--color-brand-ochre);
+  color: var(--color-ink);
+}
+.card-cream {
+  background-color: var(--color-surface-card);
+  color: var(--color-ink);
+}
 
 /* Layout / Grid */
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 var(--space-lg);
+  padding: 0;
+  width: 100%;
 }
 
 .section {

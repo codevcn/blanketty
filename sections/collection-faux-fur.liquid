@@ -5,14 +5,16 @@
 
 <section class="ff-moodboard-section" id="FauxFur-{{ section.id }}">
   <div class="ff-moodboard-container">
-    
     <div class="ff-grid">
       <!-- Left Column -->
       <div class="ff-col ff-col--left">
         <div class="ff-text-block">
           <div class="ff-eyebrow">Bộ sưu tập vải lông thú</div>
           <h2 class="ff-heading">{{ heading | escape }}</h2>
-          <p class="ff-description">Tôn vinh sự tinh tế qua từng sợi dệt. Trải nghiệm cảm giác nâng niu và mềm mại đích thực trong không gian tổ ấm của bạn.</p>
+          <p class="ff-description">
+            Tôn vinh sự tinh tế qua từng sợi dệt. Trải nghiệm cảm giác nâng niu và mềm mại đích thực trong không gian tổ
+            ấm của bạn.
+          </p>
         </div>
 
         {% if collection != blank and collection.products_count > 0 %}
@@ -53,7 +55,11 @@
             <a href="{{ product_2.url }}" class="ff-card group ff-landscape">
               <div class="ff-image-wrap">
                 {% if product_2.featured_image %}
-                  {{ product_2.featured_image | image_url: width: 1000 | image_tag: loading: 'lazy', class: 'ff-image' }}
+                  {{
+                    product_2.featured_image
+                    | image_url: width: 1000
+                    | image_tag: loading: 'lazy', class: 'ff-image'
+                  }}
                 {% else %}
                   {{ 'product-2' | placeholder_svg_tag: 'ff-image placeholder-svg' }}
                 {% endif %}
@@ -103,7 +109,17 @@
         {% endif %}
       </div>
     </div>
-    
+
+    <div class="ff-view-all-wrapper">
+      <a href="{{ collection.url }}" class="ff-view-all-btn">
+        <span class="btn-text">Xem tất cả</span>
+        <span class="btn-icon-wrapper">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 13L13 1M13 1H4M13 1V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -111,13 +127,57 @@
   /* Base Reset & Vibe */
   .ff-moodboard-section {
     background-color: var(--color-canvas); /* Warm bright background */
-    padding: 180px 0;
+    padding: 0px 0;
     overflow: hidden;
   }
   .ff-moodboard-section a {
     text-decoration: none;
     display: block;
     color: inherit; /* Fix default browser link color */
+  }
+
+  .ff-view-all-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    margin-bottom: 80px;
+  }
+
+  .ff-view-all-btn {
+    display: flex !important;
+    align-items: center;
+    width: max-content;
+    gap: 16px;
+    padding: 8px 8px 8px 32px;
+    background-color: var(--color-ink);
+    border-radius: var(--radius-pill);
+    color: var(--color-canvas) !important;
+    text-decoration: none;
+    font-size: var(--text-button-size);
+    font-weight: var(--text-button-weight);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s;
+  }
+
+  .ff-view-all-btn:hover {
+    transform: scale(0.98);
+    background-color: var(--color-primary-active);
+  }
+
+  .ff-view-all-btn .btn-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s;
+  }
+
+  .ff-view-all-btn:hover .btn-icon-wrapper {
+    transform: translate(2px, -2px) scale(1.05);
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
   }
 
   .ff-moodboard-container {
@@ -165,7 +225,7 @@
     font-family: var(--font-family-display, serif);
     font-size: clamp(3rem, 6vw, 5rem);
     font-weight: 400;
-    line-height: 1.1; 
+    line-height: 1.1;
     letter-spacing: -0.04em;
     margin: 0 0 24px 0;
     color: var(--color-ink);
@@ -187,13 +247,13 @@
     position: relative;
     overflow: hidden;
     /* Massive border radius for pill/capsule shapes */
-    border-radius: 3rem; 
+    border-radius: 3rem;
     /* Ethereal floating shadow */
     box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.06);
     transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.8s ease, border-radius 0.8s ease;
     background-color: var(--color-surface-soft);
   }
-  
+
   .ff-card:hover .ff-image-wrap {
     transform: translateY(-8px);
     box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.12);
@@ -243,7 +303,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     max-width: calc(100% - 48px);
   }
-  
+
   /* Decorative line on the left inside the badge */
   .ff-meta::before {
     content: '';
@@ -257,7 +317,7 @@
     transition: height 0.6s cubic-bezier(0.32, 0.72, 0, 1);
     border-radius: 2px;
   }
-  
+
   .ff-card:hover .ff-meta::before {
     height: 60%;
   }
@@ -278,7 +338,7 @@
     position: relative;
     display: inline-block;
   }
-  
+
   /* High-end animated underline */
   .ff-title::after {
     content: '';

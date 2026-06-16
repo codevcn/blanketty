@@ -11,14 +11,14 @@
 
   <div class="header__icons">
     {% if shop.customer_accounts_enabled %}
-      <shopify-account menu="{{ section.settings.customer_account_menu }}">
+      <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">
         {{ 'icon-account.svg' | inline_asset_content }}
-      </shopify-account>
+      </a>
     {% endif %}
 
-    <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
+    <a href="{{ routes.cart_url }}" class="header-cart-link">
+      {% if cart.items.size > 0 %}
+        <sup class="header-cart-badge">{{ cart.items.size }}</sup>
       {% endif %}
 
       {{ 'icon-cart.svg' | inline_asset_content }}
@@ -32,6 +32,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+  header .header__title {
+    font-size: 1.8rem;
   }
   header a {
     position: relative;
