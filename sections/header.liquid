@@ -4,13 +4,112 @@
     <span>.</span>
   </h2>
 
-  <div class="header__menu">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+  <nav class="header__custom-nav">
+    <a href="/pages/faq" class="header__nav-link">FAQ</a>
+    <details class="header__mega-menu">
+      <summary class="header__nav-link header__mega-trigger">
+        Bộ sưu tập
+        <svg viewBox="0 0 14 14" width="10" height="10" fill="none" class="icon-caret">
+          <path d="M1 4L7 10L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </summary>
+      <section class="header__mega-content">
+        <div class="mega-grid">
+          {% assign col1 = collections['bst-mua-dong'] %}
+          <a href="{{ col1.url | default: '/collections/bst-mua-dong' }}" class="mega-block group">
+            <div class="mega-image-wrap">
+              {% if col1.products.first.featured_image %}
+                {{ col1.products.first.featured_image | image_url: width: 600 | image_tag: class: 'mega-image' }}
+              {% else %}
+                {{ 'collection-1' | placeholder_svg_tag: 'mega-image placeholder-svg' }}
+              {% endif %}
+            </div>
+            <div class="mega-overlay">
+              <span class="mega-title">{{ col1.title | default: 'Bộ sưu tập mùa đông' }}</span>
+            </div>
+          </a>
+
+          {% assign col2 = collections['vai-long-thu'] %}
+          <a href="{{ col2.url | default: '/collections/vai-long-thu' }}" class="mega-block group">
+            <div class="mega-image-wrap">
+              {% if col2.products.first.featured_image %}
+                {{ col2.products.first.featured_image | image_url: width: 600 | image_tag: class: 'mega-image' }}
+              {% else %}
+                {{ 'collection-2' | placeholder_svg_tag: 'mega-image placeholder-svg' }}
+              {% endif %}
+            </div>
+            <div class="mega-overlay">
+              <span class="mega-title">{{ col2.title | default: 'Bộ sưu tập vải lông thú' }}</span>
+            </div>
+          </a>
+
+          {% assign col3 = collections['hoa-tiet-doc-dao-sang-tao'] %}
+          <a href="{{ col3.url | default: '/collections/hoa-tiet-doc-dao-sang-tao' }}" class="mega-block group">
+            <div class="mega-image-wrap">
+              {% if col3.products.first.featured_image %}
+                {{ col3.products.first.featured_image | image_url: width: 600 | image_tag: class: 'mega-image' }}
+              {% else %}
+                {{ 'collection-3' | placeholder_svg_tag: 'mega-image placeholder-svg' }}
+              {% endif %}
+            </div>
+            <div class="mega-overlay">
+              <span class="mega-title">{{ col3.title | default: 'Bộ sưu tập sáng tạo' }}</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </details>
+  </nav>
 
   <div class="header__icons">
+    <details class="header__search">
+      <summary class="header__search-trigger">
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="icon-search"
+        >
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </summary>
+      <div class="header__search-backdrop"></div>
+      <div class="header__search-popup">
+        <form action="{{ routes.search_url }}" method="get" class="search-form">
+          <input
+            type="text"
+            name="q"
+            placeholder="Tìm kiếm sản phẩm..."
+            class="search-input"
+            autofocus
+            autocomplete="off"
+          >
+          <button type="submit" class="search-btn">
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </form>
+        <div class="predictive-search-wrapper">
+          <ul class="predictive-search-results"></ul>
+        </div>
+      </div>
+    </details>
+
     {% if shop.customer_accounts_enabled %}
       <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}">
         {{ 'icon-account.svg' | inline_asset_content }}
@@ -19,13 +118,127 @@
 
     <a href="{{ routes.cart_url }}" class="header-cart-link">
       {% if cart.items.size > 0 %}
-        <sup class="header-cart-badge">{{ cart.items.size }}</sup>
+        <span class="header-cart-badge">{{ cart.items.size }}</span>
       {% endif %}
-
       {{ 'icon-cart.svg' | inline_asset_content }}
     </a>
   </div>
 </header>
+
+<script>
+  // Close details when clicking outside and handle exclusive open
+  const allDetails = document.querySelectorAll('details.header__mega-menu, details.header__search');
+
+  document.addEventListener('click', function (event) {
+    allDetails.forEach((details) => {
+      if (details.hasAttribute('open')) {
+        const clickedOutside = !details.contains(event.target);
+        const clickedBackdrop = event.target.classList.contains('header__search-backdrop');
+
+        if (clickedOutside || clickedBackdrop) {
+          details.removeAttribute('open');
+        }
+      }
+    });
+  });
+
+  allDetails.forEach((details) => {
+    details.addEventListener('toggle', function (e) {
+      if (details.open) {
+        allDetails.forEach((other) => {
+          if (other !== details && other.open) {
+            other.removeAttribute('open');
+          }
+        });
+
+        // Auto focus search input when search opens
+        if (details.classList.contains('header__search')) {
+          setTimeout(() => {
+            const input = details.querySelector('.search-input');
+            if (input) input.focus();
+          }, 100);
+        }
+      }
+    });
+  });
+
+  // Predictive Search Logic
+  const searchInput = document.querySelector('.search-input');
+  const searchResults = document.querySelector('.predictive-search-results');
+  let debounceTimer;
+
+  if (searchInput && searchResults) {
+    searchInput.addEventListener('input', function () {
+      clearTimeout(debounceTimer);
+      const query = this.value.trim();
+
+      if (query.length < 2) {
+        searchResults.classList.remove('is-active');
+        searchResults.innerHTML = '';
+        return;
+      }
+
+      // Show loading state
+      searchResults.innerHTML = '<li class="predictive-empty" style="grid-column: 1 / -1;">Đang tìm kiếm...</li>';
+      searchResults.classList.add('is-active');
+
+      debounceTimer = setTimeout(() => {
+        const rootUrl = window.Shopify && window.Shopify.routes ? window.Shopify.routes.root : '/';
+        const searchUrl = `${rootUrl}search/suggest.json?q=${encodeURIComponent(
+          query
+        )}&resources[type]=product&resources[limit]=10`;
+
+        fetch(searchUrl.replace('//', '/'))
+          .then((res) => {
+            if (!res.ok) throw new Error('Mạng bị lỗi hoặc không tìm thấy API');
+            return res.json();
+          })
+          .then((data) => {
+            if (!data || !data.resources || !data.resources.results || !data.resources.results.products) {
+              throw new Error('Dữ liệu API trả về không hợp lệ');
+            }
+
+            const products = data.resources.results.products;
+            searchResults.innerHTML = '';
+
+            if (products.length === 0) {
+              searchResults.innerHTML =
+                '<li class="predictive-empty" style="grid-column: 1 / -1;">Không tìm thấy sản phẩm nào phù hợp.</li>';
+              return;
+            }
+
+            products.forEach((product, index) => {
+              const li = document.createElement('li');
+              li.className = 'predictive-item-grid';
+              li.style.animationDelay = `${index * 0.05}s`;
+
+              let imageHtml = '';
+              if (product.image) {
+                imageHtml = `<img src="${product.image}" alt="${product.title}" class="predictive-image-grid">`;
+              } else {
+                imageHtml = `<div class="predictive-image-grid empty-image"></div>`;
+              }
+
+              li.innerHTML = `
+                <a href="${product.url}" class="predictive-link-grid">
+                  ${imageHtml}
+                  <div class="predictive-overlay-grid">
+                    <span class="predictive-title-grid">${product.title}</span>
+                    <span class="predictive-price-grid">${product.price}</span>
+                  </div>
+                </a>
+              `;
+              searchResults.appendChild(li);
+            });
+          })
+          .catch((error) => {
+            console.error('Predictive Search Error:', error);
+            searchResults.innerHTML = `<li class="predictive-empty" style="grid-column: 1 / -1;">Lỗi: ${error.message}</li>`;
+          });
+      }, 300);
+    });
+  }
+</script>
 
 {% stylesheet %}
   header {
@@ -33,16 +246,21 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 32px;
+    position: relative;
+    background: var(--color-canvas, #ffffff);
+    z-index: 100;
   }
   header .header__title {
     display: flex;
     font-size: 1.8rem;
     font-weight: 700;
+    margin: 0;
   }
   header a {
     position: relative;
     text-decoration: none;
-    color: var(--color-foreground);
+    color: var(--color-foreground, #111);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,10 +274,418 @@
   header svg {
     width: 2rem;
   }
-  header .header__menu,
-  header .header__icons {
+
+  /* Custom Nav */
+  .header__custom-nav {
     display: flex;
+    align-items: center;
+    gap: 32px;
+    flex: 1;
+    margin-left: 48px;
+  }
+  .header__nav-link {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+  .header__nav-link:hover {
+    opacity: 0.6;
+  }
+
+  .header__mega-menu {
+    position: static; /* Let absolute child position relative to header */
+  }
+
+  .header__mega-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none; /* remove default triangle */
+  }
+  .header__mega-trigger::-webkit-details-marker {
+    display: none;
+  }
+  .header__mega-trigger .icon-caret {
+    width: 10px;
+    transition: transform 0.3s ease;
+  }
+  details[open] .header__mega-trigger .icon-caret {
+    transform: rotate(180deg);
+  }
+
+  /* Mega Content */
+  .header__mega-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 420px;
+    background: var(--color-canvas, #ffffff);
+    border-top: 1px solid var(--color-hairline, #eee);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 999;
+    overflow: hidden;
+  }
+
+  details[open] .header__mega-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* Mega Grid */
+  .mega-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    height: 100%;
+    width: 100%;
+  }
+
+  .mega-block {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    background: #f4f4f4;
+  }
+
+  .mega-image-wrap {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+  }
+
+  .mega-image-wrap svg,
+  .mega-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .mega-block:hover .mega-image-wrap svg,
+  .mega-block:hover .mega-image-wrap img {
+    transform: scale(1.05);
+  }
+
+  /* Overlay & Glassmorphism */
+  .mega-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.6s ease;
+  }
+
+  .mega-block:hover .mega-overlay {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .mega-title {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    padding: 16px 32px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: translateY(10px);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  details[open] .mega-title {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Stagger the appearance of titles */
+  details[open] .mega-block:nth-child(1) .mega-title {
+    transition-delay: 0.1s;
+  }
+  details[open] .mega-block:nth-child(2) .mega-title {
+    transition-delay: 0.2s;
+  }
+  details[open] .mega-block:nth-child(3) .mega-title {
+    transition-delay: 0.3s;
+  }
+
+  .header__icons {
+    display: flex;
+    align-items: center;
     gap: 1rem;
+    margin-right: 1rem;
+  }
+
+  .header-cart-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--color-ink, #0a0a0a);
+  }
+
+  .header-cart-badge {
+    position: absolute;
+    top: -6px;
+    left: calc(100% - 10px);
+    background-color: var(--color-ink, #0a0a0a);
+    color: var(--color-on-primary, #ffffff);
+    font-size: 14px;
+    font-family: var(--font-family-body, Inter, sans-serif);
+    font-weight: 600;
+    line-height: 1;
+    min-width: 20px;
+    height: 25px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    pointer-events: none;
+    border: 2px solid var(--color-canvas, #fffaf0);
+  }
+  /* Search */
+  .header__search {
+    position: static;
+  }
+  .header__search-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    list-style: none;
+    transition: opacity 0.3s ease;
+  }
+  .header__search-trigger::-webkit-details-marker {
+    display: none;
+  }
+  .header__search-trigger:hover {
+    opacity: 0.6;
+  }
+
+  .header__search-backdrop {
+    position: fixed;
+    top: 5rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 90;
+    cursor: default;
+  }
+
+  details[open] .header__search-backdrop {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .header__search-popup {
+    position: absolute;
+    top: calc(100% + 16px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    width: 85vw;
+    background: var(--color-canvas, #fffaf0);
+    border: 1px solid var(--color-hairline, #e5e5e5);
+    border-radius: 12px;
+    padding: 32px 48px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 100;
+  }
+
+  details[open] .header__search-popup {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--color-hairline, #e5e5e5);
+    font-family: var(--font-family-display, 'Plain Black', Inter, sans-serif);
+    font-size: 1.3rem;
+    color: var(--color-ink, #0a0a0a);
+    padding: 12px 12px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .search-input:focus {
+    border-bottom-color: var(--color-ink, #0a0a0a);
+  }
+
+  .search-input::placeholder {
+    color: var(--color-muted, #6a6a6a);
+    opacity: 0.5;
+  }
+
+  .search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-ink, #0a0a0a);
+    color: var(--color-on-primary, #ffffff);
+    border: none;
+    border-radius: 9999px;
+    width: 64px;
+    height: 64px;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s;
+  }
+
+  .search-btn:hover {
+    transform: scale(1.05);
+    background: var(--color-primary-active, #1f1f1f);
+  }
+
+  .search-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+  .predictive-search-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .predictive-search-results {
+    display: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 480px;
+    overflow-y: auto;
+    border-top: 1px solid var(--color-hairline, #e5e5e5);
+    padding-top: 16px;
+  }
+
+  .predictive-search-results.is-active {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+
+  .predictive-search-results::-webkit-scrollbar {
+    width: 6px;
+  }
+  .predictive-search-results::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .predictive-search-results::-webkit-scrollbar-thumb {
+    background: var(--color-hairline, #e5e5e5);
+    border-radius: 4px;
+  }
+
+  .predictive-item-grid {
+    opacity: 0;
+    animation: predictiveFadeUp 0.4s ease forwards;
+  }
+
+  @keyframes predictiveFadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .predictive-link-grid {
+    position: relative;
+    display: block;
+    aspect-ratio: 4/5;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+  }
+
+  .predictive-image-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .predictive-image-grid.empty-image {
+    background: var(--color-surface-soft, #faf5e8);
+  }
+
+  .predictive-link-grid:hover .predictive-image-grid {
+    transform: scale(1.05);
+  }
+
+  .predictive-overlay-grid {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 32px 16px 16px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 2;
+  }
+
+  .predictive-title-grid {
+    font-family: var(--font-family-body, Inter, sans-serif);
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .predictive-price-grid {
+    font-family: var(--font-family-body, Inter, sans-serif);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .predictive-empty {
+    padding: 32px 16px;
+    font-family: var(--font-family-body, Inter, sans-serif);
+    font-size: 16px;
+    color: var(--color-muted, #6a6a6a);
+    text-align: center;
+    grid-column: 1 / -1;
   }
 {% endstylesheet %}
 

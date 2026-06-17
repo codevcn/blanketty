@@ -13,7 +13,7 @@
 
   {% if collection != blank and collection.products_count > 0 %}
     <div class="cp-flush-grid">
-      {% for product in collection.products limit: 6 %}
+      {% for product in collection.products limit: 9 %}
         <a href="{{ product.url }}" class="cp-card group">
           <div class="cp-image-wrap">
             {% if product.featured_image %}
@@ -22,7 +22,7 @@
               {% assign placeholder_idx = forloop.index0 | modulo: 6 | plus: 1 %}
               {{ 'product-' | append: placeholder_idx | placeholder_svg_tag: 'cp-image placeholder-svg' }}
             {% endif %}
-            
+
             <div class="cp-floating-box">
               <h3 class="cp-title">{{ product.title }}</h3>
               <p class="cp-price">{{ product.price | money }}</p>
@@ -39,7 +39,7 @@
           <div class="cp-image-wrap">
             {% assign placeholder_idx = i | modulo: 6 | plus: 1 %}
             {{ 'product-' | append: placeholder_idx | placeholder_svg_tag: 'cp-image placeholder-svg' }}
-            
+
             <div class="cp-floating-box">
               <h3 class="cp-title">Sản phẩm mẫu {{ i }}</h3>
               <p class="cp-price">2,000,000₫</p>
@@ -68,12 +68,8 @@
     background-color: var(--color-canvas, #ffffff);
     padding: 100px 0; /* Macro whitespace */
     overflow: hidden;
-    width: 100vw;
+    width: 100%;
     position: relative;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
   }
 
   .cp-awwwards-flush a {
@@ -152,35 +148,30 @@
     transform: scale(1.05);
   }
 
-  /* Floating Box */
+  /* Bottom Gradient Overlay */
   .cp-floating-box {
     position: absolute;
-    bottom: 24px;
-    left: 24px;
-    right: 24px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    padding: 16px 24px;
-    border-radius: 1.25rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1), background-color 0.6s ease;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, transparent 100%);
+    padding: 60px 24px 24px;
+    transition: padding-bottom 0.6s cubic-bezier(0.32, 0.72, 0, 1);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     z-index: 10;
   }
 
   .cp-card:hover .cp-floating-box {
-    transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.9);
+    padding-bottom: 32px;
   }
 
   .cp-title {
     font-family: var(--font-family-display);
     font-size: 1.25rem;
     font-weight: 500;
-    color: var(--color-ink);
+    color: #ffffff;
     margin: 0 0 4px 0;
     line-height: 1.3;
   }
@@ -188,7 +179,7 @@
   .cp-price {
     font-family: var(--font-family-body);
     font-size: 1rem;
-    color: var(--color-muted);
+    color: rgba(255, 255, 255, 0.8);
     margin: 0;
   }
 
